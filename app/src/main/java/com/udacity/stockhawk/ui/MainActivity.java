@@ -70,10 +70,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setRefreshing(true);
-        onRefresh();
 
         QuoteSyncJob.initialize(this);
-        getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
+        // If there's no connection, immediate sync fails, therefore DataUpdatedReceiver won't be
+        // fired, so we manually display cached data from StockProvider
+        if (!networkUp()) {
+            getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
+        }
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override
@@ -86,10 +89,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 String symbol = adapter.getSymbolAtPosition(viewHolder.getAdapterPosition());
                 PrefUtils.removeStock(MainActivity.this, symbol);
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
+                getSupportLoaderManager().restartLoader(STOCK_LOADER, null, MainActivity.this);
             }
         }).attachToRecyclerView(stockRecyclerView);
-
-
     }
 
     @Override
@@ -116,22 +118,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRefresh() {
-
-        QuoteSyncJob.syncImmediately(this);
-
-        if (!networkUp() && adapter.getItemCount() == 0) {
-            swipeRefreshLayout.setRefreshing(false);
-            error.setText(getString(R.string.error_no_network));
-            error.setVisibility(View.VISIBLE);
-        } else if (!networkUp()) {
-            swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
-        } else if (PrefUtils.getStocks(this).size() == 0) {
-            swipeRefreshLayout.setRefreshing(false);
-            error.setText(getString(R.string.error_no_stocks));
-            error.setVisibility(View.VISIBLE);
+        if (networkUp()) {
+            QuoteSyncJob.syncImmediately(this);
         } else {
-            error.setVisibility(View.GONE);
+            getSupportLoaderManager().restartLoader(STOCK_LOADER, null, MainActivity.this);
         }
     }
 
@@ -166,9 +156,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         swipeRefreshLayout.setRefreshing(false);
 
-        if (data.getCount() != 0) {
+        if (!networkUp() && adapter.getItemCount() == 0) {
+            error.setText(getString(R.string.error_no_network));
+            error.setVisibility(View.VISIBLE);
+        } else if (!networkUp()) {
+            Toast.makeText(this, R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
+        } else if (data.getCount() == 0) {
+            error.setText(getString(R.string.error_no_stocks));
+            error.setVisibility(View.VISIBLE);
+        } else {
             error.setVisibility(View.GONE);
         }
+
         adapter.setCursor(data);
     }
 
@@ -213,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     class DataUpdatedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // QuoteSsyncJob has completed and updated StockProvider,
+            // QuoteSyncJob has completed and updated StockProvider,
             // it's time to reread data from it
             getSupportLoaderManager().restartLoader(STOCK_LOADER, null, MainActivity.this);
         }
