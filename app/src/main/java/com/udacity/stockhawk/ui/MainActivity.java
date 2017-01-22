@@ -1,6 +1,9 @@
 package com.udacity.stockhawk.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -44,6 +47,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     TextView error;
     private StockAdapter adapter;
 
+    /**
+     * Listener for StockProvider's updates
+     */
+    private DataUpdatedReceiver mDataUpdatedReceiver;
+
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
@@ -82,6 +90,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }).attachToRecyclerView(stockRecyclerView);
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mDataUpdatedReceiver = new DataUpdatedReceiver();
+        IntentFilter intentFilter = new IntentFilter(QuoteSyncJob.ACTION_DATA_UPDATED);
+        registerReceiver(mDataUpdatedReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mDataUpdatedReceiver);
     }
 
     private boolean networkUp() {
@@ -185,5 +208,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    class DataUpdatedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // QuoteSsyncJob has completed and updated StockProvider,
+            // it's time to reread data from it
+            getSupportLoaderManager().restartLoader(STOCK_LOADER, null, MainActivity.this);
+        }
     }
 }
