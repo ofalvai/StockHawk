@@ -37,7 +37,7 @@ public final class PrefUtils {
 
     }
 
-    private static void editStockPref(Context context, String symbol, Boolean add) {
+    private static synchronized void editStockPref(Context context, String symbol, Boolean add) {
         String key = context.getString(R.string.pref_stocks_key);
         Set<String> stocks = getStocks(context);
 
@@ -53,11 +53,11 @@ public final class PrefUtils {
         editor.apply();
     }
 
-    public static void addStock(Context context, String symbol) {
+    public static synchronized void addStock(Context context, String symbol) {
         editStockPref(context, symbol, true);
     }
 
-    public static void removeStock(Context context, String symbol) {
+    public static synchronized void removeStock(Context context, String symbol) {
         editStockPref(context, symbol, false);
     }
 
