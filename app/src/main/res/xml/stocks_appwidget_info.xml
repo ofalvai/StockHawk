@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
                     android:initialLayout="@layout/widget_stock_list"
-                    android:previewImage="@drawable/fab_plus"
+                    android:previewImage="@drawable/widget_preview_stock_list"
                     android:minHeight="110dp"
                     android:minWidth="110dp"
                     android:resizeMode="horizontal|vertical"
                     android:updatePeriodMillis="0"
                     android:widgetCategory="home_screen|keyguard">
 </appwidget-provider>
-<!--TODO: preview image-->

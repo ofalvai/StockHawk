@@ -16,6 +16,7 @@
         android:padding="8dp"
         android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/widget_text_color"
         android:textStyle="normal|bold"/>
 
     <ListView

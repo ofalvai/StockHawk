@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_list_item_widget_stock_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
         android:padding="4dp"
-        tools:text="GOOG"
-        android:layout_alignParentStart="true"/>
+        android:textColor="@color/widget_text_color"
+        tools:text="GOOG"/>
 
     <TextView
         android:id="@+id/tv_list_item_widget_stock_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:padding="4dp"
-        tools:text="$13.37"
-        android:layout_alignParentEnd="true"/>
+        android:textColor="@color/widget_text_color"
+        tools:text="$13.37"/>
 
 </RelativeLayout>
