@@ -7,6 +7,17 @@
               android:orientation="vertical"
               android:padding="@dimen/widget_margin">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:height="32dp"
+        android:background="@color/widget_header_background"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:text="@string/app_name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textStyle="normal|bold"/>
+
     <ListView
         android:id="@+id/lv_stock_list"
         android:layout_width="match_parent"

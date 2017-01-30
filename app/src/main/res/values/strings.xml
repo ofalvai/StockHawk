@@ -36,5 +36,6 @@
     <string name="content_desc_stock_name">Name: %s</string>
     <string name="content_desc_stock_price">Price: %s</string>
     <string name="content_desc_stock_change">Change: %s</string>
+    <string name="widget_list_item_loading">Loading...</string>
 
 </resources>

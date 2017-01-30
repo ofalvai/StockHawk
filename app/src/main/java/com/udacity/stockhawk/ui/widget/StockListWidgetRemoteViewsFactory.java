@@ -26,14 +26,21 @@ import android.widget.RemoteViewsService;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class StockListWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private final Context mContext;
 
     private Cursor mCursor = null;
 
+    private DecimalFormat mDollarFormat;
+
     public StockListWidgetRemoteViewsFactory(Context context) {
         mContext = context;
+        mDollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
     }
 
     @Override
@@ -89,20 +96,21 @@ public class StockListWidgetRemoteViewsFactory implements RemoteViewsService.Rem
 
         String symbol = mCursor.getString(Contract.Quote.POSITION_SYMBOL);
         float price = mCursor.getFloat(Contract.Quote.POSITION_PRICE);
+        String formattedPrice = mDollarFormat.format(price);
 
         RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget_stock);
 
         remoteViews.setTextViewText(R.id.tv_list_item_widget_stock_symbol, symbol);
-        remoteViews.setTextViewText(R.id.tv_list_item_widget_stock_price, String.valueOf(price));
-        // TODO: currency format
+        remoteViews.setTextViewText(R.id.tv_list_item_widget_stock_price, formattedPrice);
 
         return remoteViews;
     }
 
     @Override
     public RemoteViews getLoadingView() {
-        // TODO
-        return new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget_stock);
+        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget_stock);
+        views.setTextViewText(R.id.tv_list_item_widget_stock_symbol, mContext.getString(R.string.widget_list_item_loading));
+        return views;
     }
 
     @Override
@@ -112,7 +120,7 @@ public class StockListWidgetRemoteViewsFactory implements RemoteViewsService.Rem
 
     @Override
     public long getItemId(int position) {
-        return position; //TODO
+        return position;
     }
 
     @Override
