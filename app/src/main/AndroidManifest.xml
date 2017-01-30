@@ -41,11 +41,17 @@
         <receiver android:name=".ui.widget.StockListWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.udacity.stockhawk.ACTION_DATA_UPDATED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/stocks_appwidget_info" />
+                android:resource="@xml/stocks_appwidget_info"/>
         </receiver>
+
+        <service
+            android:name=".ui.widget.StockListWidgetRemoteViewsService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

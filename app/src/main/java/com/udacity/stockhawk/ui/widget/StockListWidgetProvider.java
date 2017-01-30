@@ -3,11 +3,13 @@ package com.udacity.stockhawk.ui.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.udacity.stockhawk.R;
+import com.udacity.stockhawk.sync.QuoteSyncJob;
 import com.udacity.stockhawk.ui.MainActivity;
 
 /*
@@ -35,9 +37,11 @@ public class StockListWidgetProvider extends AppWidgetProvider {
 
         for (int i = 0; i < appWidgetIds.length; i++) {
             int appWidgetId = appWidgetIds[i];
-
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_stock_list);
-            remoteViews.setOnClickPendingIntent(R.id.tv_hello_world, makePendingIntent(context));
+
+            remoteViews.setOnClickPendingIntent(R.id.fl_widget_stock_list, makePendingIntent(context));
+
+            setRemoteAdapter(remoteViews, context);
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
@@ -46,10 +50,27 @@ public class StockListWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+
+        switch (intent.getAction()) {
+            case QuoteSyncJob.ACTION_DATA_UPDATED:
+                notifyWidgetDataChanged(context);
+                break;
+        }
     }
 
     private PendingIntent makePendingIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         return PendingIntent.getActivity(context, 0, intent, 0);
+    }
+
+    private void setRemoteAdapter(RemoteViews remoteViews, Context context) {
+        Intent remoteViewsServiceIntent = new Intent(context, StockListWidgetRemoteViewsService.class);
+        remoteViews.setRemoteAdapter(R.id.lv_stock_list, remoteViewsServiceIntent);
+    }
+
+    private void notifyWidgetDataChanged(Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(context, getClass()));
+        manager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.lv_stock_list);
     }
 }
