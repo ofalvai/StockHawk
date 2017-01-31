@@ -98,7 +98,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         for (Pair<Long, Float> pair : mHistory) {
             // Timestamp goes to the X axis, price to Y axis
-            entries.add(new Entry(pair.first / 1000, pair.second));
+            entries.add(new Entry(pair.first, pair.second));
         }
 
         // Entries need to be ascending, but the history data returned is descending
