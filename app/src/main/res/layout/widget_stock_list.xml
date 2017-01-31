@@ -8,6 +8,7 @@
               android:padding="@dimen/widget_margin">
 
     <TextView
+        android:id="@+id/tv_stock_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:height="32dp"

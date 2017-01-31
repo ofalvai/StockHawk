@@ -6,10 +6,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
+import com.udacity.stockhawk.ui.DetailActivity;
 import com.udacity.stockhawk.ui.MainActivity;
 
 /*
@@ -39,7 +41,11 @@ public class StockListWidgetProvider extends AppWidgetProvider {
             int appWidgetId = appWidgetIds[i];
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_stock_list);
 
-            remoteViews.setOnClickPendingIntent(R.id.fl_widget_stock_list, makePendingIntent(context));
+            PendingIntent mainIntent = makeMainIntent(context, appWidgetId);
+            remoteViews.setOnClickPendingIntent(R.id.tv_stock_header, mainIntent);
+
+            PendingIntent listItemIntentTemplate = makeListItemIntentTemplate(context, appWidgetId);
+            remoteViews.setPendingIntentTemplate(R.id.lv_stock_list, listItemIntentTemplate);
 
             setRemoteAdapter(remoteViews, context);
 
@@ -58,9 +64,22 @@ public class StockListWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private PendingIntent makePendingIntent(Context context) {
+    private PendingIntent makeMainIntent(Context context, int appWidgetId) {
         Intent intent = new Intent(context, MainActivity.class);
+        // When intents are compared, the extras are ignored, so we need to embed the extras
+        // into the data so that the extras will not be ignored.
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         return PendingIntent.getActivity(context, 0, intent, 0);
+    }
+
+    private PendingIntent makeListItemIntentTemplate(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, DetailActivity.class);
+        // When intents are compared, the extras are ignored, so we need to embed the extras
+        // into the data so that the extras will not be ignored.
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private void setRemoteAdapter(RemoteViews remoteViews, Context context) {

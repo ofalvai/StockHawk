@@ -16,6 +16,7 @@ package com.udacity.stockhawk.ui.widget;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
@@ -25,6 +26,7 @@ import android.widget.RemoteViewsService;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
+import com.udacity.stockhawk.ui.DetailActivity;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -103,6 +105,8 @@ public class StockListWidgetRemoteViewsFactory implements RemoteViewsService.Rem
         remoteViews.setTextViewText(R.id.tv_list_item_widget_stock_symbol, symbol);
         remoteViews.setTextViewText(R.id.tv_list_item_widget_stock_price, formattedPrice);
 
+        remoteViews.setOnClickFillInIntent(R.id.list_item_widget_stock, makeFillInIntent(symbol));
+
         return remoteViews;
     }
 
@@ -126,5 +130,11 @@ public class StockListWidgetRemoteViewsFactory implements RemoteViewsService.Rem
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    private Intent makeFillInIntent(String symbol) {
+        Intent intent = new Intent(mContext, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_QUOTE_SYMBOL, symbol);
+        return intent;
     }
 }
