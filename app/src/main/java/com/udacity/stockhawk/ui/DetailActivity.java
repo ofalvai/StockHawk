@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
+import com.udacity.stockhawk.sync.QuoteSyncJob;
+
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -19,6 +23,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private static final int LOADER_ID_STOCKS = 100;
 
     private String mSymbol;
+
+    private List<Pair<Long, Float>> mHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +43,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = Contract.Quote.COLUMN_SYMBOL + " = ?";
-        Timber.d("Selection: " + selection);
         return new CursorLoader(
                 this,
                 Contract.Quote.URI,
@@ -52,8 +57,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data == null) return;
         if (data.moveToFirst()) {
-            String historyRaw = data.getString(data.getColumnIndex(Contract.Quote.COLUMN_HISTORY));
-
+            String rawHistory = data.getString(data.getColumnIndex(Contract.Quote.COLUMN_HISTORY));
+            mHistory = QuoteSyncJob.parseQuoteHistory(rawHistory);
         }
     }
 

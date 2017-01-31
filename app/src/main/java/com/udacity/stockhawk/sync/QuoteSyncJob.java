@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.util.Pair;
 
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
@@ -170,6 +171,22 @@ public final class QuoteSyncJob {
 
 
         }
+    }
+
+    public static List<Pair<Long, Float>> parseQuoteHistory(String rawHistory) {
+        String[] rawEntries = rawHistory.split("\n");
+        List<Pair<Long, Float>> entires = new ArrayList<>();
+
+        for (int i = 0; i < rawEntries.length; i++) {
+            String rawEntry = rawEntries[i];
+            String[] entryParts = rawEntry.split(",");
+            Long timestamp = Long.valueOf(entryParts[0].trim());
+            Float price = Float.valueOf(entryParts[1].trim());
+
+            entires.add(new Pair<>(timestamp, price));
+        }
+
+        return entires;
     }
 
 
